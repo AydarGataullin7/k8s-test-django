@@ -146,4 +146,45 @@ git status
 
 ```kubernetes/secret.yaml (новый файл)```
 
-```kubernetes/postgres.yam```l
+```kubernetes/postgres.yaml```
+
+## Настройка Ingress
+
+### Доступ к сайту через Ingress
+
+Для доступа к сайту через Ingress необходимо:
+
+1. Включить Ingress Controller в Minikube:
+```bash
+minikube addons enable ingress
+```
+2. Применить манифесты:
+
+```bash
+kubectl apply -f kubernetes/postgres.yaml
+kubectl apply -f kubernetes/secret.yaml
+kubectl apply -f kubernetes/django.yaml
+kubectl apply -f kubernetes/ingress.yaml
+```
+3. Настроить файл ```hosts```:
+
+Получить IP-адрес Minikube:
+
+```bash
+minikube ip
+```
+Добавить запись в файл ```hosts``` ```(/etc/hosts на Linux/macOS, C:\Windows\System32\drivers\etc\hosts на Windows)```:
+
+```text
+192.168.49.2 star-burger.test
+```
+4. Проверить работу Ingress:
+
+```bash
+curl -v -H "Host: star-burger.test" http://localhost:8080
+```
+5. Открыть сайт в браузере:
+
+```text
+http://star-burger.test
+```
