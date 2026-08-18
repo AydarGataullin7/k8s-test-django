@@ -75,3 +75,75 @@ $ docker compose build web
 `ALLOWED_HOSTS` -- настройка Django со списком разрешённых адресов. Если запрос прилетит на другой адрес, то сайт ответит ошибкой 400. Можно перечислить несколько адресов через запятую, например `127.0.0.1,192.168.0.1,site.test`. [Документация Django](https://docs.djangoproject.com/en/3.2/ref/settings/#allowed-hosts).
 
 `DATABASE_URL` -- адрес для подключения к базе данных PostgreSQL. Другие СУБД сайт не поддерживает. [Формат записи](https://github.com/jacobian/dj-database-url#url-schema).
+
+## Kubernetes Deployment
+
+### Настройка секретов
+
+Для работы приложения в Kubernetes необходимо создать Secret с переменными окружения.
+
+1. Создайте файл `kubernetes/secret.yaml` со следующим содержимым:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: django-secret
+type: Opaque
+data:
+  SECRET_KEY: bXlfc2VjcmV0X2tleQ==
+  DATABASE_URL: cG9zdGdyZXM6Ly90ZXN0X2s4czpPd090QmVwOUZydXRAcG9zdGdyZXMtZGI6NTQzMi90ZXN0X2s4cw==
+  ```
+2. Примените Secret в кластере:
+
+```bash
+kubectl apply -f kubernetes/secret.yaml
+```
+3. Разверните приложение:
+
+```bash
+kubectl apply -f kubernetes/django.yaml
+kubectl apply -f kubernetes/postgres.yaml
+```
+4. Проверьте, что сайт работает:
+
+```bash
+minikube service django-service --url
+```
+### 1. Переменные окружения:
+
+```SECRET_KEY``` — секретный ключ Django
+
+```DATABASE_URL``` — строка подключения к PostgreSQL
+
+```DEBUG``` — режим отладки (```False``` в ```production```)
+
+``ALLOWED_HOSTS`` — разрешённые хосты
+
+Создание нового ```Secret```
+Для создания нового ```Secret``` с другими значениями:
+
+```bash
+# Закодировать строку в base64
+echo -n "my_secret_key" | base64
+# Применить новый Secret
+kubectl apply -f kubernetes/secret.yaml
+```
+
+Сохраните файл (Ctrl+S) и закройте Блокнот.
+
+### 2. Проверьте, что файлы готовы для коммита
+
+```powershell
+cd D:\python_scripts\k8s-test-django
+git status
+```
+Вы должны увидеть изменённые файлы:
+
+```README.md```
+
+```kubernetes/django.yaml```
+
+```kubernetes/secret.yaml (новый файл)```
+
+```kubernetes/postgres.yam```l
