@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: django-clearsessions
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: clearsessions
+            image: django_app:latest
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: SECRET_KEY
+              value: "my_secret_key"
+            - name: DATABASE_URL
+              value: "postgres://test_k8s:OwOtBep9Frut@postgres-db:5432/test_k8s"
+            - name: DEBUG
+              value: "False"
+            - name: ALLOWED_HOSTS
+              value: "*"
+            command:
+            - python
+            - manage.py
+            - clearsessions
+          restartPolicy: OnFailure

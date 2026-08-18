@@ -188,3 +188,28 @@ curl -v -H "Host: star-burger.test" http://localhost:8080
 ```text
 http://star-burger.test
 ```
+## Автоматическая очистка сессий
+
+Для регулярной очистки устаревших сессий Django используется CronJob.
+
+1. Применить CronJob:
+```bash
+kubectl apply -f kubernetes/cronjob.yaml
+```
+2. Проверить расписание:
+```bash
+kubectl get cronjobs
+```
+3. Запустить вручную (для теста):
+```bash
+kubectl create job --from=cronjob/django-clearsessions django-clearsessions-manual
+```
+4. Посмотреть логи:
+```bash
+kubectl logs job/django-clearsessions-manual
+```
+5. Очистка тестового Job'а:
+```bash
+kubectl delete job django-clearsessions-manual
+```
+CronJob настроен на ежедневный запуск в 3:00 ночи.
