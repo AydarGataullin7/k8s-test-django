@@ -35,10 +35,7 @@ spec:
             - name: ALLOWED_HOSTS
               value: "*"
             - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: django-secret
-                  key: DATABASE_URL
+              value: "postgres://test_k8s:123@postgres-db-postgresql:5432/test_k8s"
           ports:
             - containerPort: 8000
           livenessProbe:
