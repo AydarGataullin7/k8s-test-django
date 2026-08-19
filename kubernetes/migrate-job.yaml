@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: django_app:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SECRET_KEY
+          value: "my_secret_key"
+        - name: DATABASE_URL
+          value: "postgres://test_k8s:OwOtBep9Frut@postgres-db:5432/test_k8s"
+        - name: DEBUG
+          value: "False"
+        - name: ALLOWED_HOSTS
+          value: "*"
+        command:
+        - python
+        - manage.py
+        - migrate
+        - --noinput
+      restartPolicy: OnFailure
